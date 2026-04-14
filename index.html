@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Everyone App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fbfbfd;
+    --surface: #ffffff;
+    --ink: #1d1d1f;
+    --ink-soft: #6e6e73;
+    --ink-faint: #a1a1a6;
+    --line: #e5e5ea;
+    --accent: #0071e3;
+    --accent-soft: #e8f1fc;
+    --green: #34c759;
+    --orange: #ff9f0a;
+    --blue-deep: #0a2540;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Geist', -apple-system, sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+
+  .display { font-family: 'Fraunces', serif; font-weight: 400; letter-spacing: -0.03em; }
+
+  /* ---------- NAV ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    background: rgba(251,251,253,0.8);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-inner {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 32px;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .logo-mark {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #4a90e2, #0a2540 80%);
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .logo-mark::after {
+    content: ''; position: absolute; inset: 6px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 70% 70%, transparent 40%, rgba(255,255,255,0.15) 41%, transparent 42%),
+                radial-gradient(circle at 30% 60%, transparent 35%, rgba(255,255,255,0.1) 36%, transparent 37%);
+  }
+  .logo-text { font-size: 17px; font-weight: 500; letter-spacing: -0.01em; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links button {
+    background: none; border: none; cursor: pointer;
+    font-family: inherit; font-size: 13px; color: var(--ink);
+    transition: opacity 0.2s; opacity: 0.85;
+  }
+  .nav-links button:hover { opacity: 1; color: var(--accent); }
+  .nav-links button.active { color: var(--accent); opacity: 1; }
+
+  /* ---------- VIEWS ---------- */
+  .view { display: none; animation: fadeUp 0.5s ease; }
+  .view.active { display: block; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---------- HOME / HERO ---------- */
+  .hero {
+    text-align: center;
+    padding: 100px 32px 60px;
+    max-width: 900px; margin: 0 auto;
+  }
+  .hero .eyebrow {
+    font-size: 13px; color: var(--accent); font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(48px, 8vw, 88px);
+    font-weight: 400; letter-spacing: -0.04em;
+    line-height: 1.02; margin-bottom: 24px;
+  }
+  .hero h1 em {
+    font-style: italic; color: var(--accent);
+  }
+  .hero p {
+    font-size: 21px; color: var(--ink-soft);
+    max-width: 600px; margin: 0 auto 36px;
+    line-height: 1.45;
+  }
+  .cta-row { display: flex; gap: 12px; justify-content: center; }
+  .btn {
+    padding: 12px 22px; border-radius: 980px;
+    font-family: inherit; font-size: 15px; font-weight: 500;
+    border: none; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #0077ed; transform: translateY(-1px); }
+  .btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+  .btn-ghost:hover { border-color: var(--ink); }
+
+  /* ---------- FEATURE GRID ---------- */
+  .features {
+    max-width: 1200px; margin: 40px auto 120px;
+    padding: 0 32px;
+    display: grid; grid-template-columns: repeat(12, 1fr);
+    gap: 16px;
+  }
+  .tile {
+    background: var(--surface);
+    border-radius: 24px;
+    padding: 36px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    position: relative; overflow: hidden;
+    border: 1px solid var(--line);
+    min-height: 320px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .tile:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.06); }
+  .tile-large { grid-column: span 8; min-height: 380px; }
+  .tile-small { grid-column: span 4; }
+  .tile-medium { grid-column: span 6; }
+  .tile-label {
+    font-size: 12px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--ink-faint);
+    font-weight: 500;
+  }
+  .tile h3 {
+    font-family: 'Fraunces', serif; font-weight: 400;
+    font-size: 32px; letter-spacing: -0.02em;
+    margin: 12px 0 8px; line-height: 1.1;
+  }
+  .tile p { color: var(--ink-soft); font-size: 15px; max-width: 380px; }
+  .tile-visual { margin-top: 24px; flex: 1; display: flex; align-items: flex-end; }
+
+  /* ---------- TILE VISUALS ---------- */
+  .viz-map {
+    width: 100%; height: 160px; border-radius: 16px;
+    background: linear-gradient(135deg, #e8f1fc 0%, #f5f5f7 100%);
+    position: relative; overflow: hidden;
+  }
+  .viz-map::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(to right, rgba(10,37,64,0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(10,37,64,0.06) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .viz-map svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+  .viz-fish {
+    width: 100%; height: 160px; border-radius: 16px;
+    background: linear-gradient(180deg, #d8ecf7 0%, #5a9fd4 100%);
+    position: relative; overflow: hidden;
+  }
+  .viz-fish::after {
+    content: ''; position: absolute; inset: 0;
+    background-image: radial-gradient(circle at 20% 60%, rgba(255,255,255,0.4) 2px, transparent 3px),
+                      radial-gradient(circle at 70% 40%, rgba(255,255,255,0.3) 2px, transparent 3px),
+                      radial-gradient(circle at 40% 80%, rgba(255,255,255,0.25) 1.5px, transparent 2.5px);
+  }
+
+  .viz-sky {
+    width: 100%; height: 160px; border-radius: 16px;
+    background: linear-gradient(180deg, #6bb6ff 0%, #ffd89b 100%);
+    position: relative; overflow: hidden;
+  }
+
+  .viz-weather {
+    width: 100%; height: 160px; border-radius: 16px;
+    background: linear-gradient(135deg, #ffd89b 0%, #ff9f0a 100%);
+    position: relative; overflow: hidden;
+  }
+
+  .viz-trails {
+    width: 100%; height: 160px; border-radius: 16px;
+    background: linear-gradient(135deg, #c8e6c9 0%, #4a7c4e 100%);
+    position: relative; overflow: hidden;
+  }
+
+  .viz-local {
+    width: 100%; height: 160px; border-radius: 16px;
+    background: linear-gradient(135deg, #f5e6d3 0%, #d4a574 100%);
+    position: relative; overflow: hidden;
+  }
+
+  /* ---------- DETAIL VIEWS ---------- */
+  .detail {
+    max-width: 1200px; margin: 0 auto;
+    padding: 60px 32px 120px;
+  }
+  .back-link {
+    background: none; border: none; cursor: pointer;
+    font-family: inherit; font-size: 14px; color: var(--accent);
+    margin-bottom: 32px; padding: 0;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .detail h2 {
+    font-family: 'Fraunces', serif; font-weight: 400;
+    font-size: clamp(40px, 6vw, 64px); letter-spacing: -0.03em;
+    line-height: 1.05; margin-bottom: 16px;
+  }
+  .detail .lede {
+    font-size: 19px; color: var(--ink-soft);
+    max-width: 640px; margin-bottom: 48px;
+  }
+
+  .panel {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 20px; padding: 28px;
+    margin-bottom: 16px;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+  .input-row {
+    display: flex; gap: 8px; margin-bottom: 20px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 14px; padding: 6px;
+  }
+  .input-row input {
+    flex: 1; border: none; background: none;
+    padding: 12px 14px; font-family: inherit; font-size: 15px;
+    color: var(--ink); outline: none;
+  }
+  .input-row button {
+    background: var(--accent); color: white; border: none;
+    padding: 10px 20px; border-radius: 10px; cursor: pointer;
+    font-family: inherit; font-size: 14px; font-weight: 500;
+  }
+
+  /* Map view */
+  .big-map {
+    width: 100%; height: 420px; border-radius: 20px;
+    background: linear-gradient(135deg, #e8f1fc 0%, #f5f5f7 100%);
+    position: relative; overflow: hidden;
+    border: 1px solid var(--line); margin-bottom: 16px;
+  }
+  .big-map::before {
+    content: ''; position: absolute; inset: 0;
+    background-image:
+      linear-gradient(to right, rgba(10,37,64,0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(10,37,64,0.06) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .step-list { list-style: none; }
+  .step-list li {
+    display: flex; gap: 16px; padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .step-list li:last-child { border-bottom: none; }
+  .step-num {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; flex-shrink: 0;
+  }
+  .step-text { font-size: 15px; }
+  .step-text .sub { color: var(--ink-faint); font-size: 13px; margin-top: 2px; }
+
+  /* Cards / lists */
+  .card {
+    padding: 20px; border-radius: 16px;
+    background: var(--surface); border: 1px solid var(--line);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .card:hover { border-color: var(--ink-faint); transform: translateY(-2px); }
+  .card-title { font-weight: 500; font-size: 16px; margin-bottom: 4px; }
+  .card-meta { font-size: 13px; color: var(--ink-soft); }
+  .card-tag {
+    display: inline-block; padding: 3px 10px; border-radius: 980px;
+    font-size: 11px; font-weight: 500; margin-top: 10px;
+    background: var(--accent-soft); color: var(--accent);
+  }
+
+  .stat {
+    text-align: center; padding: 24px;
+  }
+  .stat-num {
+    font-family: 'Fraunces', serif; font-size: 56px;
+    font-weight: 400; letter-spacing: -0.03em; line-height: 1;
+  }
+  .stat-label {
+    font-size: 13px; color: var(--ink-soft); margin-top: 8px;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+
+  /* Weather hero */
+  .weather-hero {
+    background: linear-gradient(135deg, #ffd89b 0%, #ff9f0a 100%);
+    border-radius: 20px; padding: 40px;
+    color: white; margin-bottom: 16px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .weather-temp { font-family: 'Fraunces', serif; font-size: 96px; font-weight: 300; line-height: 1; }
+  .weather-meta { text-align: right; }
+  .weather-meta div:first-child { font-size: 22px; font-weight: 500; }
+
+  .hourly { display: flex; gap: 16px; overflow-x: auto; padding: 8px 0; }
+  .hour { text-align: center; min-width: 64px; }
+  .hour-time { font-size: 12px; color: var(--ink-soft); }
+  .hour-temp { font-size: 18px; font-weight: 500; margin-top: 8px; }
+
+  /* Sky / airspace */
+  .sky-display {
+    background: linear-gradient(180deg, #1a3a5c 0%, #4a7ba8 100%);
+    border-radius: 20px; padding: 32px;
+    color: white; min-height: 320px;
+    position: relative; overflow: hidden;
+  }
+  .sky-zone {
+    padding: 14px 18px; margin-bottom: 10px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    border-left: 3px solid var(--green);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .sky-zone.warn { border-left-color: var(--orange); }
+  .sky-zone.danger { border-left-color: #ff453a; }
+  .sky-zone-name { font-weight: 500; font-size: 15px; }
+  .sky-zone-sub { font-size: 12px; opacity: 0.7; margin-top: 2px; }
+  .sky-zone-status {
+    font-size: 11px; padding: 4px 10px; border-radius: 980px;
+    background: rgba(52,199,89,0.2); color: #34c759;
+    text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;
+  }
+  .sky-zone.warn .sky-zone-status { background: rgba(255,159,10,0.2); color: var(--orange); }
+  .sky-zone.danger .sky-zone-status { background: rgba(255,69,58,0.2); color: #ff453a; }
+
+  /* Passion grid */
+  .passion-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .passion {
+    background: white;
+    padding: 32px 28px;
+    transition: background 0.2s;
+    cursor: pointer;
+  }
+  .passion:hover { background: #fafafc; }
+  .passion-label {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+  .passion-list {
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .passion-list span {
+    font-size: 14px;
+    color: var(--ink-soft);
+    font-weight: 400;
+  }
+  @media (max-width: 900px) { .passion-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .passion-grid { grid-template-columns: 1fr; } }
+
+  /* footer */
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 40px 32px;
+    text-align: center;
+    color: var(--ink-faint);
+    font-size: 12px;
+  }
+
+  @media (max-width: 768px) {
+    .nav-links { gap: 14px; }
+    .nav-links button { font-size: 12px; }
+    .tile-large, .tile-small, .tile-medium { grid-column: span 12; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .weather-hero { flex-direction: column; gap: 16px; text-align: center; }
+    .weather-meta { text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo" onclick="show('home')">
+      <div class="logo-mark"></div>
+      <div class="logo-text">Everyone</div>
+    </div>
+    <div class="nav-links">
+      <button onclick="show('drive')">Drive</button>
+      <button onclick="show('fish')">Fish</button>
+      <button onclick="show('sky')">Sky</button>
+      <button onclick="show('weather')">Weather</button>
+      <button onclick="show('trails')">Trails</button>
+      <button onclick="show('local')">Local</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ============ HOME ============ -->
+<section class="view active" id="home">
+  <div class="hero">
+    <div class="eyebrow">The Everyone App</div>
+    <h1>If you have a passion,<br><em>welcome.</em></h1>
+    <p>Most apps are built for one kind of person — the gamer, the hiker, the foodie. We built one for all of them. For everyone.</p>
+    <div class="cta-row">
+      <button class="btn btn-primary" onclick="show('drive')">Start exploring</button>
+      <button class="btn btn-ghost">Read our story</button>
+    </div>
+  </div>
+
+  <!-- Manifesto -->
+  <div style="max-width: 820px; margin: 40px auto 80px; padding: 0 32px; text-align: center;">
+    <div style="display:inline-block; padding: 6px 14px; border-radius: 980px; background: var(--accent-soft); color: var(--accent); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 24px;">Why we built this</div>
+    <p class="display" style="font-size: clamp(28px, 4vw, 40px); line-height: 1.25; color: var(--ink); letter-spacing: -0.02em;">
+      Apps in the app store are always built for <em style="color: var(--ink-faint); font-style: italic;">one type of person</em> — a gamer, a nature lover, a social butterfly. They're great. But what if one app had <em style="color: var(--accent); font-style: italic;">everything?</em>
+    </p>
+    <p style="font-size: 18px; color: var(--ink-soft); margin-top: 28px; line-height: 1.55;">
+      Never focused on a single thing. Never asking you to be one kind of person. Whoever you are, whatever you're into — there's something here for you.
+    </p>
+  </div>
+
+  <div class="features">
+    <div class="tile tile-large" onclick="show('drive')" style="background: linear-gradient(135deg, #f5f5f7, #e8f1fc);">
+      <div>
+        <div class="tile-label">Drive</div>
+        <h3>Get there, the smart way.</h3>
+        <p>Turn-by-turn directions with live traffic, scenic routes, and EV charging stops baked in.</p>
+      </div>
+      <div class="viz-map">
+        <svg viewBox="0 0 400 160" preserveAspectRatio="none">
+          <path d="M20,140 Q80,120 120,90 T220,60 T380,30" stroke="#0071e3" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <circle cx="20" cy="140" r="6" fill="#0071e3"/>
+          <circle cx="380" cy="30" r="6" fill="#34c759"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="tile tile-small" onclick="show('weather')">
+      <div>
+        <div class="tile-label">Weather</div>
+        <h3>72°</h3>
+        <p>Sunny in Ellicott City. Light breeze.</p>
+      </div>
+      <div class="viz-weather"></div>
+    </div>
+
+    <div class="tile tile-medium" onclick="show('fish')">
+      <div>
+        <div class="tile-label">Fish</div>
+        <h3>Where they're biting.</h3>
+        <p>Crowdsourced spots, species, and seasonal tips.</p>
+      </div>
+      <div class="viz-fish"></div>
+    </div>
+
+    <div class="tile tile-medium" onclick="show('sky')">
+      <div>
+        <div class="tile-label">Sky</div>
+        <h3>Fly with confidence.</h3>
+        <p>Airspace, NOTAMs, and drone restrictions in real time.</p>
+      </div>
+      <div class="viz-sky"></div>
+    </div>
+
+    <div class="tile tile-medium" onclick="show('trails')">
+      <div>
+        <div class="tile-label">Trails</div>
+        <h3>The great outdoors, mapped.</h3>
+        <p>Hikes near you, ranked by difficulty and view.</p>
+      </div>
+      <div class="viz-trails"></div>
+    </div>
+
+    <div class="tile tile-medium" onclick="show('local')">
+      <div>
+        <div class="tile-label">Local</div>
+        <h3>The good stuff nearby.</h3>
+        <p>Restaurants, shops, and hidden gems people actually love.</p>
+      </div>
+      <div class="viz-local"></div>
+    </div>
+  </div>
+
+  <!-- For Everyone — passion categories -->
+  <div style="background: white; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 100px 32px;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+      <div style="text-align: center; margin-bottom: 72px;">
+        <div style="display:inline-block; padding: 6px 14px; border-radius: 980px; background: var(--accent-soft); color: var(--accent); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 20px;">For everyone</div>
+        <h2 class="display" style="font-size: clamp(36px, 5vw, 56px); letter-spacing: -0.03em; line-height: 1.05;">Whatever your <em style="font-style:italic; color: var(--accent);">thing</em> is.</h2>
+        <p style="color: var(--ink-soft); font-size: 18px; margin-top: 16px; max-width: 540px; margin-left:auto; margin-right:auto;">Browse by passion. Find what speaks to you. Try something new.</p>
+      </div>
+
+      <div class="passion-grid">
+        <div class="passion">
+          <div class="passion-label">Outdoors</div>
+          <div class="passion-list"><span>Trails</span><span>Fishing</span><span>Camping</span><span>Stargazing</span></div>
+        </div>
+        <div class="passion">
+          <div class="passion-label">Mind</div>
+          <div class="passion-list"><span>Reading</span><span>Puzzles</span><span>Meditation</span><span>Journaling</span></div>
+        </div>
+        <div class="passion">
+          <div class="passion-label">Create</div>
+          <div class="passion-list"><span>Drawing</span><span>Music</span><span>Writing</span><span>Photography</span></div>
+        </div>
+        <div class="passion">
+          <div class="passion-label">Move</div>
+          <div class="passion-list"><span>Running</span><span>Yoga</span><span>Cycling</span><span>Strength</span></div>
+        </div>
+        <div class="passion">
+          <div class="passion-label">Connect</div>
+          <div class="passion-list"><span>Events</span><span>Meetups</span><span>Communities</span><span>Pen pals</span></div>
+        </div>
+        <div class="passion">
+          <div class="passion-label">Play</div>
+          <div class="passion-list"><span>Games</span><span>Trivia</span><span>Chess</span><span>Collectibles</span></div>
+        </div>
+        <div class="passion">
+          <div class="passion-label">Home</div>
+          <div class="passion-list"><span>Recipes</span><span>Gardening</span><span>Repair</span><span>Budgeting</span></div>
+        </div>
+        <div class="passion">
+          <div class="passion-label">Work</div>
+          <div class="passion-list"><span>Focus</span><span>Notes</span><span>Tasks</span><span>Freelance</span></div>
+        </div>
+        <div class="passion">
+          <div class="passion-label">Wonder</div>
+          <div class="passion-list"><span>History</span><span>Languages</span><span>Science</span><span>Astronomy</span></div>
+        </div>
+        <div class="passion">
+          <div class="passion-label">Sound</div>
+          <div class="passion-list"><span>Music</span><span>Podcasts</span><span>Radio</span><span>Audiobooks</span></div>
+        </div>
+        <div class="passion">
+          <div class="passion-label">Taste</div>
+          <div class="passion-list"><span>Recipes</span><span>Coffee</span><span>Wine</span><span>Restaurants</span></div>
+        </div>
+        <div class="passion">
+          <div class="passion-label">Care</div>
+          <div class="passion-list"><span>Sleep</span><span>Wellness</span><span>Pets</span><span>Family</span></div>
+        </div>
+      </div>
+
+      <div style="text-align:center; margin-top: 64px;">
+        <p style="color: var(--ink-soft); font-size: 15px; margin-bottom: 20px;">Don't see your thing? It's coming.</p>
+        <button class="btn btn-ghost">Suggest a passion</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Closing -->
+  <div style="text-align:center; padding: 120px 32px;">
+    <h2 class="display" style="font-size: clamp(40px, 6vw, 72px); letter-spacing: -0.03em; line-height: 1.05;">One app.<br><em style="font-style:italic; color:var(--accent);">All of you.</em></h2>
+    <p style="color: var(--ink-soft); font-size: 19px; margin: 24px auto 36px; max-width: 540px;">You're not just one thing. Why should your apps be?</p>
+    <button class="btn btn-primary">Get the Everyone App</button>
+  </div>
+</section>
+
+<!-- ============ DRIVE ============ -->
+<section class="view" id="drive">
+  <div class="detail">
+    <button class="back-link" onclick="show('home')">← Back</button>
+    <h2>Drive.</h2>
+    <p class="lede">Tell us where. We'll handle the how.</p>
+
+    <div class="input-row">
+      <input placeholder="From — Ellicott City, MD" value="Ellicott City, MD"/>
+      <input placeholder="To — anywhere"/>
+      <button>Get directions</button>
+    </div>
+
+    <div class="big-map">
+      <svg viewBox="0 0 1000 420" preserveAspectRatio="none" style="position:absolute; inset:0; width:100%; height:100%;">
+        <path d="M50,380 Q200,300 280,260 T500,180 Q650,140 750,100 T950,40" stroke="#0071e3" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="0"/>
+        <circle cx="50" cy="380" r="10" fill="#0071e3"/>
+        <circle cx="950" cy="40" r="10" fill="#34c759"/>
+        <text x="70" y="375" font-family="Geist" font-size="13" fill="#1d1d1f" font-weight="500">Start</text>
+        <text x="900" y="35" font-family="Geist" font-size="13" fill="#1d1d1f" font-weight="500">End</text>
+      </svg>
+    </div>
+
+    <div class="grid-3">
+      <div class="stat panel"><div class="stat-num">2h 14m</div><div class="stat-label">Travel time</div></div>
+      <div class="stat panel"><div class="stat-num">128<span style="font-size:32px">mi</span></div><div class="stat-label">Distance</div></div>
+      <div class="stat panel"><div class="stat-num">$14<span style="font-size:32px">.20</span></div><div class="stat-label">Est. fuel</div></div>
+    </div>
+
+    <div class="panel" style="margin-top:24px;">
+      <h3 style="font-family:Fraunces; font-size:24px; margin-bottom:16px;">Turn by turn</h3>
+      <ol class="step-list">
+        <li><span class="step-num">1</span><div class="step-text">Head north on Main St<div class="sub">0.4 mi</div></div></li>
+        <li><span class="step-num">2</span><div class="step-text">Merge onto US-29 N toward Columbia<div class="sub">12.1 mi</div></div></li>
+        <li><span class="step-num">3</span><div class="step-text">Take exit 38 for I-95 N<div class="sub">0.3 mi</div></div></li>
+        <li><span class="step-num">4</span><div class="step-text">Continue on I-95 N for 87 miles<div class="sub">1h 12m</div></div></li>
+        <li><span class="step-num">5</span><div class="step-text">Arrive at destination<div class="sub">on the right</div></div></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FISH ============ -->
+<section class="view" id="fish">
+  <div class="detail">
+    <button class="back-link" onclick="show('home')">← Back</button>
+    <h2>Fish.</h2>
+    <p class="lede">Find the spot. Catch the story.</p>
+
+    <div class="input-row">
+      <input placeholder="Search by species, lake, or river" value="Smallmouth bass near me"/>
+      <button>Find spots</button>
+    </div>
+
+    <div class="grid-2" style="margin-bottom: 16px;">
+      <div class="panel" style="padding: 0; overflow: hidden;">
+        <div class="viz-fish" style="height: 220px; border-radius: 0;"></div>
+        <div style="padding: 24px;">
+          <div class="card-meta">⭐ 4.8 · 142 reports this month</div>
+          <h3 style="font-family:Fraunces; font-size:24px; margin: 8px 0;">Patapsco River — Daniels</h3>
+          <p style="color: var(--ink-soft); font-size:14px;">Smallmouth bass, channel cat. Best in early morning and after rain. Wade-friendly.</p>
+          <span class="card-tag">Hot right now</span>
+        </div>
+      </div>
+      <div class="panel" style="padding: 0; overflow: hidden;">
+        <div class="viz-fish" style="height: 220px; border-radius: 0; background: linear-gradient(180deg, #d4e8f0 0%, #4a8fb5 100%);"></div>
+        <div style="padding: 24px;">
+          <div class="card-meta">⭐ 4.6 · 89 reports this month</div>
+          <h3 style="font-family:Fraunces; font-size:24px; margin: 8px 0;">Centennial Lake</h3>
+          <p style="color: var(--ink-soft); font-size:14px;">Largemouth, bluegill, crappie. Great for families. Bank fishing all around.</p>
+          <span class="card-tag">Family friendly</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-title">Liberty Reservoir</div>
+        <div class="card-meta">22 mi · Bass, walleye</div>
+        <span class="card-tag">⭐ 4.7</span>
+      </div>
+      <div class="card">
+        <div class="card-title">Loch Raven</div>
+        <div class="card-meta">28 mi · Bass, perch</div>
+        <span class="card-tag">⭐ 4.5</span>
+      </div>
+      <div class="card">
+        <div class="card-title">Triadelphia Reservoir</div>
+        <div class="card-meta">15 mi · Bass, pickerel</div>
+        <span class="card-tag">⭐ 4.6</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SKY ============ -->
+<section class="view" id="sky">
+  <div class="detail">
+    <button class="back-link" onclick="show('home')">← Back</button>
+    <h2>Sky.</h2>
+    <p class="lede">Know before you fly. Drones, planes, and everything between.</p>
+
+    <div class="input-row">
+      <input placeholder="Enter a location to check airspace" value="Ellicott City, MD"/>
+      <button>Check</button>
+    </div>
+
+    <div class="sky-display">
+      <div style="font-family:Fraunces; font-size:32px; margin-bottom: 4px;">Class G — Uncontrolled</div>
+      <div style="opacity:0.8; margin-bottom: 24px; font-size:14px;">Below 1,200 ft AGL · Drone flight permitted</div>
+
+      <div class="sky-zone">
+        <div>
+          <div class="sky-zone-name">LAANC authorization</div>
+          <div class="sky-zone-sub">Auto-approved up to 400 ft</div>
+        </div>
+        <div class="sky-zone-status">Clear</div>
+      </div>
+      <div class="sky-zone warn">
+        <div>
+          <div class="sky-zone-name">BWI airport — 8.2 mi</div>
+          <div class="sky-zone-sub">Class B airspace nearby — verify altitude</div>
+        </div>
+        <div class="sky-zone-status">Caution</div>
+      </div>
+      <div class="sky-zone">
+        <div>
+          <div class="sky-zone-name">Active NOTAMs</div>
+          <div class="sky-zone-sub">None in your area</div>
+        </div>
+        <div class="sky-zone-status">Clear</div>
+      </div>
+      <div class="sky-zone danger">
+        <div>
+          <div class="sky-zone-name">Temporary Flight Restriction</div>
+          <div class="sky-zone-sub">Camp David — 32 mi NW · Active</div>
+        </div>
+        <div class="sky-zone-status">Restricted</div>
+      </div>
+    </div>
+
+    <div class="grid-3" style="margin-top: 16px;">
+      <div class="stat panel"><div class="stat-num">400<span style="font-size:24px">ft</span></div><div class="stat-label">Max altitude</div></div>
+      <div class="stat panel"><div class="stat-num">12<span style="font-size:24px">mph</span></div><div class="stat-label">Wind aloft</div></div>
+      <div class="stat panel"><div class="stat-num">10<span style="font-size:24px">mi</span></div><div class="stat-label">Visibility</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WEATHER ============ -->
+<section class="view" id="weather">
+  <div class="detail">
+    <button class="back-link" onclick="show('home')">← Back</button>
+    <h2>Weather.</h2>
+    <p class="lede">Beautiful, accurate, and right where you are.</p>
+
+    <div class="weather-hero">
+      <div>
+        <div style="opacity:0.9; font-size:14px;">Ellicott City, MD</div>
+        <div class="weather-temp">72°</div>
+        <div style="font-size:18px;">Sunny</div>
+      </div>
+      <div class="weather-meta">
+        <div>H: 78° L: 54°</div>
+        <div style="opacity:0.85; margin-top:8px; font-size:14px;">Feels like 74°</div>
+        <div style="opacity:0.85; font-size:14px;">Humidity 38%</div>
+        <div style="opacity:0.85; font-size:14px;">Wind 6 mph NE</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div style="font-size:13px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:16px;">Hourly</div>
+      <div class="hourly">
+        <div class="hour"><div class="hour-time">Now</div><div>☀️</div><div class="hour-temp">72°</div></div>
+        <div class="hour"><div class="hour-time">2pm</div><div>☀️</div><div class="hour-temp">74°</div></div>
+        <div class="hour"><div class="hour-time">3pm</div><div>☀️</div><div class="hour-temp">76°</div></div>
+        <div class="hour"><div class="hour-time">4pm</div><div>⛅</div><div class="hour-temp">75°</div></div>
+        <div class="hour"><div class="hour-time">5pm</div><div>⛅</div><div class="hour-temp">73°</div></div>
+        <div class="hour"><div class="hour-time">6pm</div><div>☁️</div><div class="hour-temp">68°</div></div>
+        <div class="hour"><div class="hour-time">7pm</div><div>☁️</div><div class="hour-temp">64°</div></div>
+        <div class="hour"><div class="hour-time">8pm</div><div>🌙</div><div class="hour-temp">61°</div></div>
+        <div class="hour"><div class="hour-time">9pm</div><div>🌙</div><div class="hour-temp">59°</div></div>
+        <div class="hour"><div class="hour-time">10pm</div><div>🌙</div><div class="hour-temp">57°</div></div>
+      </div>
+    </div>
+
+    <div class="grid-3" style="margin-top: 16px;">
+      <div class="stat panel"><div class="stat-num">0<span style="font-size:24px">%</span></div><div class="stat-label">Rain today</div></div>
+      <div class="stat panel"><div class="stat-num">6</div><div class="stat-label">UV index</div></div>
+      <div class="stat panel"><div class="stat-num">7:42</div><div class="stat-label">Sunset</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TRAILS ============ -->
+<section class="view" id="trails">
+  <div class="detail">
+    <button class="back-link" onclick="show('home')">← Back</button>
+    <h2>Trails.</h2>
+    <p class="lede">Find your next walk in the woods.</p>
+
+    <div class="input-row">
+      <input placeholder="Search trails by name or area" value="Hikes near Ellicott City"/>
+      <button>Search</button>
+    </div>
+
+    <div class="grid-2">
+      <div class="panel" style="padding: 0; overflow: hidden;">
+        <div class="viz-trails" style="height:200px; border-radius:0;"></div>
+        <div style="padding: 24px;">
+          <div class="card-meta">⭐ 4.9 · Easy · 2.4 mi loop</div>
+          <h3 style="font-family:Fraunces; font-size:24px; margin: 8px 0;">Patapsco Valley — Cascade Falls</h3>
+          <p style="color:var(--ink-soft); font-size:14px;">Waterfall views, mossy boulders, stream crossings. A local favorite.</p>
+          <span class="card-tag">Dog friendly</span>
+        </div>
+      </div>
+      <div class="panel" style="padding: 0; overflow: hidden;">
+        <div class="viz-trails" style="height:200px; border-radius:0; background: linear-gradient(135deg, #b8d4ba 0%, #2d5e30 100%);"></div>
+        <div style="padding: 24px;">
+          <div class="card-meta">⭐ 4.7 · Moderate · 4.8 mi out & back</div>
+          <h3 style="font-family:Fraunces; font-size:24px; margin: 8px 0;">Sugarloaf Mountain Summit</h3>
+          <p style="color:var(--ink-soft); font-size:14px;">Panoramic views from the top. Some rock scrambling near summit.</p>
+          <span class="card-tag">Best views</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-3" style="margin-top: 16px;">
+      <div class="card">
+        <div class="card-title">Catoctin Mountain Loop</div>
+        <div class="card-meta">5.2 mi · Hard · ⭐ 4.8</div>
+        <span class="card-tag">Backcountry</span>
+      </div>
+      <div class="card">
+        <div class="card-title">Lake Kittamaqundi Trail</div>
+        <div class="card-meta">3.4 mi · Easy · ⭐ 4.5</div>
+        <span class="card-tag">Paved</span>
+      </div>
+      <div class="card">
+        <div class="card-title">Rocks State Park</div>
+        <div class="card-meta">2.1 mi · Moderate · ⭐ 4.7</div>
+        <span class="card-tag">Climbing</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LOCAL ============ -->
+<section class="view" id="local">
+  <div class="detail">
+    <button class="back-link" onclick="show('home')">← Back</button>
+    <h2>Local.</h2>
+    <p class="lede">The places people in your neighborhood actually love.</p>
+
+    <div class="input-row">
+      <input placeholder="Try 'cozy coffee', 'date night', or 'best tacos'" value="best brunch in Ellicott City"/>
+      <button>Find</button>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-title">The Forge</div>
+        <div class="card-meta">American · $$ · 0.3 mi</div>
+        <p style="color:var(--ink-soft); font-size:13px; margin-top:8px;">"Best biscuits in Howard County. Get the brisket hash."</p>
+        <span class="card-tag">⭐ 4.8 · Locals' pick</span>
+      </div>
+      <div class="card">
+        <div class="card-title">Manor Hill Tavern</div>
+        <div class="card-meta">Gastropub · $$$ · 0.5 mi</div>
+        <p style="color:var(--ink-soft); font-size:13px; margin-top:8px;">"Farm-to-table done right. Patio is unbeatable in spring."</p>
+        <span class="card-tag">⭐ 4.7 · Date night</span>
+      </div>
+      <div class="card">
+        <div class="card-title">Bean Hollow</div>
+        <div class="card-meta">Coffee · $ · 0.2 mi</div>
+        <p style="color:var(--ink-soft); font-size:13px; margin-top:8px;">"Your neighborhood third place. Strong pour-overs, kind people."</p>
+        <span class="card-tag">⭐ 4.9 · Cozy</span>
+      </div>
+      <div class="card">
+        <div class="card-title">Phoenix Emporium</div>
+        <div class="card-meta">Pub · $$ · 0.1 mi</div>
+        <p style="color:var(--ink-soft); font-size:13px; margin-top:8px;">"Old Ellicott City institution. Crab dip is non-negotiable."</p>
+        <span class="card-tag">⭐ 4.6 · Historic</span>
+      </div>
+      <div class="card">
+        <div class="card-title">Pure Wine Café</div>
+        <div class="card-meta">Wine bar · $$ · 0.2 mi</div>
+        <p style="color:var(--ink-soft); font-size:13px; margin-top:8px;">"Smart list, no pretension. Great cheese boards."</p>
+        <span class="card-tag">⭐ 4.7</span>
+      </div>
+      <div class="card">
+        <div class="card-title">Su Casa</div>
+        <div class="card-meta">Home goods · $$ · 0.4 mi</div>
+        <p style="color:var(--ink-soft); font-size:13px; margin-top:8px;">"Beautifully curated furniture and gifts. A treat to browse."</p>
+        <span class="card-tag">⭐ 4.8 · Hidden gem</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  The Everyone App · A prototype · Built for everyone, everywhere
+</footer>
+
+<script>
+  function show(id) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+    const link = Array.from(document.querySelectorAll('.nav-links button')).find(b => b.textContent.toLowerCase() === id);
+    if (link) link.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>
